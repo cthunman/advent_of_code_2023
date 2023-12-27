@@ -6,9 +6,10 @@
 
 struct Game {
     int gameNumber;
-    // int redCount;
-    // int blueCount;
-    // int greenCount;
+    int redCount;
+    int blueCount;
+    int greenCount;
+    int gamePower;
 };
 
 struct Draws {
@@ -112,9 +113,9 @@ int main() {
 
     struct Game *game = (struct Game *)malloc(sizeof(struct Game));
     game->gameNumber = 0;
-    // game->redCount = 0;
-    // game->greenCount = 0;
-    // game->blueCount = 0;
+    game->redCount = 0;
+    game->greenCount = 0;
+    game->blueCount = 0;
     struct GameNode *rootNode =
         (struct GameNode *)malloc(sizeof(struct GameNode));
     rootNode->game = game;
@@ -123,38 +124,42 @@ int main() {
     while (getline(&line, &len, file) != -1) {
         int fail = 0;
         gameNumber = readNumber(line, 5);
+        struct Game *currentGame = (struct Game *)malloc(sizeof(struct Game));
+        currentGame->gameNumber = gameNumber;
+        currentGame->redCount = 0;
+        currentGame->greenCount = 0;
+        currentGame->blueCount = 0;
+
         char *startChar = strchr(line, ':');
         printf("Game #%d:\n", gameNumber);
         do {
             startChar++;
             struct Draws *draws = parseDraws(startChar);
-            if (draws->redCount > redMax || draws->greenCount > greenMax ||
-                draws->blueCount > blueMax) {
-                fail = 1;
-                printf("FAIL: ");
+            if (draws->redCount > currentGame->redCount) {
+                currentGame->redCount = draws->redCount;
             }
-            // printf("%d %d %d", draws->redCount, draws->greenCount,
-            //        draws->blueCount);
-            // printf("\n");
+            if (draws->greenCount > currentGame->greenCount) {
+                currentGame->greenCount = draws->greenCount;
+            }
+            if (draws->blueCount > currentGame->blueCount) {
+                currentGame->blueCount = draws->blueCount;
+            }
         } while ((startChar = strchr(startChar, ';')) != NULL && !fail);
+        currentGame->gamePower = currentGame->redCount *
+                                 currentGame->greenCount *
+                                 currentGame->blueCount;
 
-        if (!fail) {
-            struct Game *passingGame =
-                (struct Game *)malloc(sizeof(struct Game));
-            passingGame->gameNumber = gameNumber;
-
-            struct GameNode *passingNode =
-                (struct GameNode *)malloc(sizeof(struct GameNode));
-            passingNode->game = passingGame;
-            currentNode->next = passingNode;
-            currentNode = passingNode;
-        }
+        struct GameNode *passingNode =
+            (struct GameNode *)malloc(sizeof(struct GameNode));
+        passingNode->game = currentGame;
+        currentNode->next = passingNode;
+        currentNode = passingNode;
     }
     int result = 0;
     currentNode = rootNode;
     while (currentNode != NULL) {
         // printf("adding: %d\n", currentNode->game->gameNumber);
-        result += currentNode->game->gameNumber;
+        result += currentNode->game->gamePower;
         printf("current total: %d\n", result);
         currentNode = currentNode->next;
     }
