@@ -143,21 +143,21 @@ int main() {
     int numParts = 0;
     for (int i = 0; i < gridSize; i++) {
         for (int j = 0; j < gridSize; j++) {
-            if (grid[i][j] != '.' && !isdigit(grid[i][j])) {
+            if (grid[i][j] == '*') {
                 printf("loc: %d %d\n", i, j);
                 numParts++;
                 struct Node *n = getFilteredNumberNodes(
                     getAdjacentDigits(createCoordinate(i, j), grid, gridSize),
                     grid);
-                while (n != NULL) {
-                    int num = readNumberAtCoordinate(n->c, grid, gridSize);
-                    n = n->next;
+                if (n->next != NULL && n->next->next == NULL) {
+                    int num1 = readNumberAtCoordinate(n->c, grid, gridSize);
+                    int num2 = readNumberAtCoordinate(n->next->c, grid, gridSize);
                     struct PartNode *pnode =
                         (struct PartNode *)malloc(sizeof(struct PartNode));
-                    pnode->partNum = num;
+                    pnode->partNum = num1 * num2;
                     curr->next = pnode;
                     curr = pnode;
-                    printf("Adding number: %d\n", num);
+                    printf("Adding number: %d\n", pnode->partNum);
                 }
             }
         }
