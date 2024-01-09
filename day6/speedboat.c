@@ -94,7 +94,7 @@ int solution1() {
 
     int mult = 1;
     for (int i = 0; i < 4; i++) {
-        printf("Race %d: %d %d\n", i, arr[i].time, arr[i].distance);
+        printf("Race %d: %ld %ld\n", i, arr[i].time, arr[i].distance);
         int result = solveRace(&arr[i]);
         printf("Race %d: %d\n", i, result);
         mult *= result;
